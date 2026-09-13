@@ -45,6 +45,8 @@ void IsRightCorrect(int *array, size_t array_len, size_t r, int base);
 
 void IsLeftCorrect(int *array, size_t array_len, size_t l, int base);
 
+int IsSortedArray(int *array, size_t array_len);
+
 
 
 int main()
@@ -59,6 +61,7 @@ int main()
         Qsort(a, len, Compare);
         printf("\n\n");
         PrintArray(a, len);
+        IsSortedArray(a, len);
         printf("gk = %d\n", gk);
         gk = 0;
         printf("---------------------------------------------------------\n");
@@ -124,6 +127,9 @@ int Compare(int a, int b)
 
 void Qsort(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
 {
+    PRED printf("\n\nВызвана функция Qsort\n");
+    PRED PrintArray(array, array_len); DEF_COL
+    printf("\n");
     gk++;
     if (gk > 1000)
     {
@@ -216,6 +222,21 @@ size_t Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
     IsCorrect(array, array_len, l, r, base);
     getchar();
     return l;
+}
+
+int IsSortedArray(int *array, size_t array_len)
+{
+    int error = 0;
+    for (int i = 0; i < array_len-1; i++)
+        if (array[i] > array[i+1])
+            error++;
+    if (error == 0)
+    {
+        PGREEN
+        printf("It's sorted array\n");
+        DEF_COL
+    }
+    return error;
 }
 
 
