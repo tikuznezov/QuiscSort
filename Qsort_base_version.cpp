@@ -145,8 +145,6 @@ void Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
                 PrintSortingArray(array, array_len, l, r, base, iter_counter);
             }
 
-            // if (l == r)
-            //     break;
             printf("swap(%d, %d)\n", array[l], array[r]);
             Swap(&array[l], &array[r]);
             iter_counter++;
@@ -154,17 +152,7 @@ void Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
         }
         // printf("processed: l = %zu(%d), r = %zu(%d)\n", l, array[l], r, array[r]);
     }
-    // if (CompareFunc(array[l], base))
-    // {
-    //     l++;
-    //     iter_counter++;
-    // }
-    // if (!CompareFunc(array[r], base))
-    // {
-    //     r--;
-    //     iter_counter++;
-    // }
-    
+
     PrintSortingArray(array, array_len, l, r, base, iter_counter);
     PRED printf("base = %d\n", base); DEF_COL
     // printf("end: l = %zu(%d), r = %zu(%d)\n", l, array[l], r, array[r]);
