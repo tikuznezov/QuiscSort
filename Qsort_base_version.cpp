@@ -5,7 +5,8 @@
 #include <stdbool.h>
 #include <assert.h>
 
-int gk = 0;
+// #include "degub.h"
+#include "no_debug.h"
 
 //! Задает красный цвет текста
 #define PRED printf("\x1b[31m");
@@ -25,7 +26,7 @@ int gk = 0;
 #define MAX(a, b) (a > b) ? a : b
 #define MIN(a, b) (a < b) ? a : b
 
-int *CrateRandomArray(int len);
+int *CrateRandomArray(size_t len);
 
 void Qsort(int *array, size_t array_len, int (*CompareFunc)(int a, int b));
 
@@ -49,22 +50,27 @@ int IsSortedArray(int *array, size_t array_len);
 
 
 
+
+
 int main()
 {
     printf("\n");
-    size_t len = 1;
+    size_t len = 0;
+    scanf("%zu", &len);
+
     while (len != 0)
-    {    
+    {
         int *a = CrateRandomArray(len);
-        PrintArray(a, len);
-        printf("\n");
+        // PrintArray(a, len);
+        // printf("\n");
+
         Qsort(a, len, Compare);
-        printf("\n\n");
-        PrintArray(a, len);
+
+        // printf("\n\n");
+        // PrintArray(a, len);
         IsSortedArray(a, len);
-        printf("gk = %d\n", gk);
-        gk = 0;
         printf("---------------------------------------------------------\n");
+
         scanf("%zu", &len);
     }
 
@@ -74,12 +80,17 @@ int main()
 
 
 // создает массив со случайными числами длины len
-int *CrateRandomArray(int len)
+int *CrateRandomArray(size_t len)
 {
     srand((unsigned int)time(NULL));
-    int *array = (int *)calloc(len, sizeof(int));
+
+    int *array = NULL;
+    array = (int *)calloc(len, sizeof(int));
+    assert(array);
+
     for (int i = 0; i < len; i++)
-        array[i] = rand()%100 * pow(-1, rand());
+        array[i] = rand() * pow(-1, rand());
+
     return array;
 }
 
@@ -127,44 +138,38 @@ int Compare(int a, int b)
 
 void Qsort(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
 {
-    PRED printf("\n\nВызвана функция Qsort\n");
-    PRED PrintArray(array, array_len); DEF_COL
-    printf("\n");
-    gk++;
-    if (gk > 1000)
-    {
-        printf("Сбой в %d сортировке.\n", gk);
-        exit(1);
-    }
+    FUNC_CALL_INFO
+
     assert(array);
 
     if (array_len == 2)
     {
         if (array[0] > array[1])
             Swap(&array[0], &array[1]);
-        PGREEN PrintArray(&array[0], array_len); DEF_COL
+        SHOW_ARRAY2
         return;
     }
     else if (array_len == 1)
     {
-        PGREEN PrintArray(&array[0], array_len); DEF_COL
+        SHOW_ARRAY1
         return;
     }
     else if (array_len > 0)
     {
         size_t right_pointer = Part(array, array_len, CompareFunc);
 
-        if (right_pointer >= 1)
+        if (right_pointer == -1)
+            return;
+
+        else if (right_pointer > 0)
         {
-            printf("\nРазделение ЛЕВОГО массива с 0 по %d; Длина = %d;\n", right_pointer-1, right_pointer);
-            PrintArray(&array[0], right_pointer);
+            SHOW_LEFT_SEP
             Qsort(&array[0], right_pointer, CompareFunc);
         }
 
         size_t Rlen = array_len - right_pointer;
         int * Raddress = &array[right_pointer];
-        printf("\nРазделение ПРАВОГО массива с %d по %d; Длина = %d\n", right_pointer, array_len - 1, array_len - right_pointer - 1);
-        PrintArray(Raddress, array_len - right_pointer - 1);
+        SHOW_RIGHT_SEP
         Qsort(Raddress, Rlen, CompareFunc); // Сам опорный элемент гарантированно стоит на нужном месте, так что его пропускаем
     }
     else
@@ -179,15 +184,13 @@ size_t Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
     size_t base_index = rand() % array_len;
 
     int base = array[base_index];
-    PRED printf("base = %d\n", base); DEF_COL
+    SHOW_BASE
     int iter_counter = 0;
 
     size_t l = 0;
     size_t r = array_len-1;
 
-    printf("start: l = %zu(%d), r = %zu(%d)\n", l, array[l], r, array[r]);
-    PrintSortingArray(array, array_len, l, r, base, iter_counter);
-    printf("\n");
+    SHOW_START_INFO
 
     while ((l < r) && (l < array_len) && (l >= 0) &&  (r < array_len) && (r >= 0))
     {
@@ -195,7 +198,7 @@ size_t Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
         {
             iter_counter++;
             l++;
-            PrintSortingArray(array, array_len, l, r, base, iter_counter);
+            SHOW_SORT_STEP
         }
         else // если array[l] >= base
         {
@@ -204,23 +207,29 @@ size_t Part(int *array, size_t array_len, int (*CompareFunc)(int a, int b))
                 // пока array[r] <= base
                 iter_counter++;
                 r--; 
-                PrintSortingArray(array, array_len, l, r, base, iter_counter);
+                SHOW_SORT_STEP
             }
 
-            printf("swap(%d, %d)\n", array[l], array[r]);
+            SHOW_SWAP
             Swap(&array[l], &array[r]);
             iter_counter++;
-            PrintSortingArray(array, array_len, l, r, base, iter_counter);
+            SHOW_SORT_STEP
         }
-        // printf("processed: l = %zu(%d), r = %zu(%d)\n", l, array[l], r, array[r]);
+    }
+    // SHOW_SORT_STEP
+    SHOW_BASE
+    SHOW_RETURN
+    SHOW_IS_CORRECT
+    GETCHAR
+
+    if ((l == 0) && (array[l] == base))
+    {
+        for (int i = 1; i < array_len; i++)
+            if (array[i] != base)
+                return l;
+        return -1;
     }
 
-    // PrintSortingArray(array, array_len, l, r, base, iter_counter);
-    PRED printf("base = %d\n", base); DEF_COL
-    printf("return: %d\n", l);
-    // printf("end: l = %zu(%d), r = %zu(%d)\n", l, array[l], r, array[r]);
-    IsCorrect(array, array_len, l, r, base);
-    getchar();
     return l;
 }
 
@@ -234,6 +243,12 @@ int IsSortedArray(int *array, size_t array_len)
     {
         PGREEN
         printf("It's sorted array\n");
+        DEF_COL
+    }
+    else
+    {
+        PRED
+        printf("INCORRECT ARRAY!!!\n");
         DEF_COL
     }
     return error;
