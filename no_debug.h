@@ -1,8 +1,10 @@
+#ifndef debug
+#define debug
+
+
 #define FUNC_CALL_INFO 
 
-#define SHOW_ARRAY2
-
-#define SHOW_ARRAY1
+#define SHOW_ARRAY
 
 #define SHOW_LEFT_SEP
 
@@ -21,3 +23,8 @@
 #define GETCHAR
 
 #define SHOW_SWAP
+
+#define SEPARATE
+
+
+#endif
